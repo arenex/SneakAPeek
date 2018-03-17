@@ -21,6 +21,7 @@ router.get('/', (req, res) => {
     });
 });
 router.get('/streams', (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*");
     // parse streams from query parameter
     const streams = JSON.parse(req.query.streams);
 
