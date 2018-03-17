@@ -39,6 +39,7 @@ class Driver {
     takeStreamPic(channelInfo) {
         const imageSaveName = `img${channelInfo.num}.png`;
         return execP(`rm -f ${imageSaveName}`).then(() => {
+            channelInfo.img = null;
             return new Promise((resolve) => {
                 this.getStreamUrl(channelInfo.name).then(url => {
                     channelInfo.url = '';
@@ -54,6 +55,9 @@ class Driver {
                     }
                 });
             });
+        }).then(channelInfo => {
+            channelInfo.img = `http://localhost:3000/${imageSaveName}`; //TODO: don't hardcode host
+            return channelInfo
         });
     }
     getStreamUrl(twitchChannel) {
