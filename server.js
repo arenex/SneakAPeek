@@ -17,7 +17,11 @@ var driver = new Driver(
 function sendChannelInfo(channelInfos) {
     var obj = {};
     obj.status = 'request_complete';
-    obj.channelInfos = channelInfos;
+    obj.channelInfos = channelInfos.map(channel => {
+        channel.img = `http://localhost:3000/${channel.img}`;
+        return channel;
+    });
+    console.log(obj.channelInfos);
     sendResponseToClient(obj);
 }
 

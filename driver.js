@@ -56,8 +56,8 @@ class Driver {
                 });
             });
         }).then(channelInfo => {
-            channelInfo.img = `http://localhost:3000/${imageSaveName}`; //TODO: don't hardcode host
-            return channelInfo
+            channelInfo.img = imageSaveName;
+            return channelInfo;
         });
     }
     getStreamUrl(twitchChannel) {
