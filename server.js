@@ -1,81 +1,56 @@
 "use strict";
 process.title = 'sneakapeek';
 
-// websocket and http servers
-var webSocketServer = require('websocket').server; //{@websocket@1.0.23@}
-var http = require('http');
-var server, wsServer;
-var webSocketsServerPort = 1515;
-var clients = [];
-__setupWebSocket();
-
 var ffmpegBusy = false;
-var makeTwitchSnapshots = require('./driver.js');
+var Driver = require('./driver.js');
+var driver = new Driver(
+);
 
-function sendChannelInfo(channelInfos) {
-    var obj = {};
-    obj.status = 'request_complete';
-    obj.channelInfos = channelInfos;
-    sendResponseToClient(obj);
-}
+const path = require("path");
+const express = require("express");
 
-function processClientRequest(message) {
-    try {
-        var obj = JSON.parse(message);
-        if (!ffmpegBusy && obj.command == 'makesnapshots' && obj.channels != null) {
-            ffmpegBusy = true;
-            makeTwitchSnapshots(obj.channels).then(channelInfos => {
-                ffmpegBusy = false;
-                sendChannelInfo(channelInfos);
-            });
-        }
-    } catch(e) {
-        console.log('Error:',e);
-        // ToDo: sendResponseToClient({response: "Bad Request"});
-    }
-}
+const port = 3000;
 
-function sendResponseToClient(object) {
-    // broadcast
-    var jsonMsg = JSON.stringify(object);
-    console.log('sending to clients');
-    clients.forEach(function(client) {
-        client.sendUTF(jsonMsg);
+const app = express();
+
+// routes
+const router = express.Router();
+router.get('/', (req, res) => {
+    res.json({
+        message: "hell world"
     });
-}
+});
+router.get('/streams', (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    // parse streams from query parameter
+    const streams = JSON.parse(req.query.streams);
 
-function __setupWebSocket() {
-    // Http server
-    server = http.createServer(function(request, response) {});
-    server.listen(webSocketsServerPort, function() {
-        console.log((new Date()) + " Server is listening on port " + webSocketsServerPort);
-    });
-
-    // WebSocket server - tied to a HTTP server. WebSocket request is just an enhanced HTTP request. For more info http://tools.ietf.org/html/rfc6455#page-6
-    wsServer = new webSocketServer({
-        httpServer: server
-    });
-
-    // This callback function is called every time someone tries to connect to the WebSocket server
-    wsServer.on('request', function(request) {
-        console.log((new Date()) + ' Connection from origin ' + request.origin + '.');
-        // accept connection - you should check 'request.origin' to make sure that client is connecting from your website (http://en.wikipedia.org/wiki/Same_origin_policy)
-        var connection = request.accept(null, request.origin); 
-        // we need to know client index to remove them on 'close' event
-        var index = clients.push(connection) - 1;
-        console.log((new Date()) + ' Connection accepted.');
-
-        // user sent some message
-        connection.on('message', function(message) {
-            if (message.type === 'utf8') { // accept only text
-                processClientRequest(message.utf8Data);
+    if (!ffmpegBusy && streams && streams.length) {
+        ffmpegBusy = true;
+        driver.run(streams).then(channelInfos => {
+            console.log(channelInfos);
+            ffmpegBusy = false;
+            for(let channel in channelInfos){
+                channelInfos[channel].img = `http://localhost:${port}/${channelInfos[channel].img}`;
             }
+            res.json({
+                streams: channelInfos
+            });
         });
+    } else {
+        res.json({
+            message: "something went wrong"
+        });
+    }
+});
 
-        // user disconnected
-        connection.on('close', function(connection) {
-            console.log((new Date()) + " Peer " + connection.remoteAddress + " disconnected.");
-            clients.splice(index, 1); // remove user from the list of connected clients
-        });
-    });
-}
+app.use(express.static(path.join(__dirname, "./"), {
+    etag: false,
+    maxage: '0h'
+}));
+app.use('/api', router);
+
+// start the server
+app.listen(port, function () {
+    console.log(`Listening on http://localhost:${port}/`);
+});

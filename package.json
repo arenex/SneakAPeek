@@ -1,17 +1,16 @@
 {
-  "name": "sneakAPeek",
+  "name": "sneakapeek",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
   "dependencies": {
+    "express": "^4.16.3",
     "twitch-get-stream": "^0.4.1",
     "twitch-url": "^1.0.0",
     "websocket": "1.0.23"
   },
   "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "scripts": {},
   "keywords": [],
   "author": "",
   "license": "ISC"
