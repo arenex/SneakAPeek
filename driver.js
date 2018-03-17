@@ -34,7 +34,12 @@ class Driver {
             var promise = this.takeStreamPic(channelInfo);
             promises.push(promise);
         });
-        return Promise.all(promises);
+        return Promise.all(promises).then(streams => {
+            return streams.reduce((result, stream) => {
+                result[stream.name] = stream;
+                return result;
+            }, {});
+        });
     }
     takeStreamPic(channelInfo) {
         const imageSaveName = `img${channelInfo.num}.png`;
@@ -47,6 +52,7 @@ class Driver {
                         channelInfo.url = url;
                         this.grabTwitchFrameAndSave(url, imageSaveName).then(() => {
                             channelInfo.success = true;
+                            channelInfo.img = imageSaveName;
                             resolve(channelInfo);
                         });
                     } else {
@@ -56,7 +62,6 @@ class Driver {
                 });
             });
         }).then(channelInfo => {
-            channelInfo.img = imageSaveName;
             return channelInfo;
         });
     }

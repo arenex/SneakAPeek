@@ -19,29 +19,30 @@
 </head>
 <body>
 
-<div class="container"> <img class="img" src="img1000.png"></img> </div>
-<div class="container"> <img class="img" src="img1001.png"></img> </div>
-<div class="container"> <img class="img" src="img1002.png"></img> </div>
-<div class="container"> <img class="img" src="img1003.png"></img> </div>
-<div class="container"> <img class="img" src="img1004.png"></img> </div>
+<div class="container"> <img class="img" data-channel="loltyler1" src="img1000.png"></img> </div>
+<div class="container"> <img class="img" data-channel="solary" src="img1001.png"></img> </div>
+<div class="container"> <img class="img" data-channel="c9sneaky" src="img1002.png"></img> </div>
+<div class="container"> <img class="img" data-channel="sparcmaclived" src="img1003.png"></img> </div>
+<div class="container"> <img class="img" data-channel="hashinshin" src="img1004.png"></img> </div>
 <button id="button" onclick="requestServerData()">Refresh Images</button>
 
 <script>
   function requestServerData() {
     button.disabled = true;
-    var imgs = document.querySelectorAll('.img');
+    const imgs = [...document.querySelectorAll('.img')];
+    const channels = imgs.reduce((result, img) => {
+      result[img.getAttribute("data-channel")] = img;
+      return result;
+    }, {});
 
-    // hardcode for now
-    var channels = ['loltyler1', 'solary', 'c9sneaky', 'sparcmaclived', 'hashinshin'];
-
-    return fetch(`http://localhost:3000/api/streams?streams=${JSON.stringify(channels)}`).then(response => {
+    return fetch(`http://localhost:3000/api/streams?streams=${JSON.stringify(Object.keys(channels))}`).then(response => {
       return response.json();
     }).then(json => {
       button.disabled = false;
       // update each image
-      json.streams.forEach((stream, idx) => {
-        imgs[idx].src = `${stream.img}?${Date.now()}`; 
-      });
+      for(let channel in json.streams){
+        channels[channel].src = `${json.streams[channel].img}?${Date.now()}`; 
+      };
     }).catch(err => {
       button.disabled = false;
       throw err;

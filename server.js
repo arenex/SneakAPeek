@@ -30,7 +30,7 @@ router.get('/streams', (req, res) => {
         driver.run(streams).then(channelInfos => {
             console.log(channelInfos);
             ffmpegBusy = false;
-            channelInfos.forEach(channel => {
+            Object.entries(channelInfos).forEach(channel => {
                 channel.img = `http://localhost:${port}/${channel.img}`;
             });
             res.json({
