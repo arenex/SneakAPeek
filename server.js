@@ -22,7 +22,7 @@ router.get('/', (req, res) => {
 });
 router.get('/streams', (req, res) => {
     // parse streams from query parameter
-    const streams = JSON.parse(`{"o":${req.query.streams}}`).o;
+    const streams = JSON.parse(req.query.streams);
 
     if (!ffmpegBusy && streams && streams.length) {
         ffmpegBusy = true;
