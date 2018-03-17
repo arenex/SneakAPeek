@@ -13,8 +13,8 @@ class Driver {
     grabTwitchFrameAndSave(url, saveName) {
         return new Promise((resolve, reject) => {
             var cmd = [
-                'rm -f ' + saveName,
-                '"' + this.ffmpegPath + '" -y -i "' + url + '" -ss 00:00:00 -f image2 -vframes 1 ' + saveName
+                `rm -f ${saveName}`,
+                `"${this.ffmpegPath}" -y -i "${url}" -ss 00:00:00 -f image2 -vframes 1 ${saveName}`
             ].join(' && ');
             console.log(cmd);
             exec(cmd, (error, stdout, stderr) => {
