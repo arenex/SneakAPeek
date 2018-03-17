@@ -4,11 +4,13 @@ process.title = 'sneakapeek-driver';
 const {
     exec
 } = require('child_process');
+const twitchGetStream = require("twitch-get-stream");
 
 class Driver {
     constructor(twitchId, ffmpegPath = "ffmpeg") {
         this.twitchId = twitchId;
         this.ffmpegPath = ffmpegPath;
+        this.getTwitchStream = (channel) => twitchGetStream(this.twitchId).get(channel);
     }
     grabTwitchFrameAndSave(url, saveName) {
         return new Promise((resolve, reject) => {
@@ -16,7 +18,6 @@ class Driver {
                 `rm -f ${saveName}`,
                 `"${this.ffmpegPath}" -y -i "${url}" -ss 00:00:00 -f image2 -vframes 1 ${saveName}`
             ].join(' && ');
-            console.log(cmd);
             exec(cmd, (error, stdout, stderr) => {
                 resolve();
             });
@@ -56,7 +57,7 @@ class Driver {
     getStreamUrl(twitchChannel) {
         return new Promise((resolve, reject) => {
             var anyUrl = null;
-            require("twitch-get-stream")(this.twitchId).get(twitchChannel).then(streams => {
+            this.getTwitchStream(twitchChannel).then(streams => {
                 streams.forEach(stream => {
                     if (stream.url) {
                         if (!(stream.quality && stream.quality == 'Audio Only')) {
