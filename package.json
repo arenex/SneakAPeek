@@ -1,8 +1,8 @@
 {
-  "name": "RsTwitchStreamSnapshots",
+  "name": "SneakAPeek",
   "version": "1.0.0",
   "description": "",
-  "main": "StreamSnapshot.js",
+  "main": "server.js",
   "dependencies": {
     "twitch-get-stream": "^0.4.1",
     "twitch-url": "^1.0.0",
