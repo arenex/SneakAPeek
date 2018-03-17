@@ -42,6 +42,9 @@
       json.streams.forEach((stream, idx) => {
         imgs[idx].src = `${stream.img}?${Date.now()}`; 
       });
+    }).catch(err => {
+      button.disabled = false;
+      throw err;
     });
   }
 </script>
