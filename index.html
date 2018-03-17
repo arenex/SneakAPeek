@@ -25,73 +25,25 @@
 <div class="container"> <img class="img" src="img1003.png"></img> </div>
 <div class="container"> <img class="img" src="img1004.png"></img> </div>
 <button id="button" onclick="requestServerData()">Refresh Images</button>
-<p id="txt">...connecting to server</p>
 
 <script>
+  function requestServerData() {
+    button.disabled = true;
+    var imgs = document.querySelectorAll('.img');
 
-function websocket_send(message) {
-	if (!window.websocketconnected) return;
-	window.websocketconnection.send(message);
-}
+    // hardcode for now
+    var channels = ['loltyler1', 'solary', 'c9sneaky', 'sparcmaclived', 'hashinshin'];
 
-function websocket_onReceive(message) {
-  message = JSON.parse(message);
-  console.log('received ',message);
-  if (message.status == 'request_complete') {
-		button.disabled = false;
-		// update each image
-		var imgs = document.querySelectorAll('.img');
-		for (var i = 0; i < imgs.length; i++) {
-		var rand = Math.floor(Math.random() * 9000000);
-			imgs[i].src = 'img100'+i+'.png?rand='+rand;
-		}
-	}
-}
-
-function websocket_onConnect() {
-  console.log('connected');
-  txt.innerHTML = 'connected';
-}
-
-function requestServerData() {
-  button.disabled = true;
-
-  // hardcode for now
-  var channels = ['loltyler1', 'solary', 'c9sneaky', 'sparcmaclived', 'hashinshin'];
-  var obj = {};
-  obj.command = 'makesnapshots';
-  obj.channels = channels;
-
-  websocket_send(JSON.stringify(obj));
-}
-
-__injectWebsocket('localhost', '1515');
-
-// --------------------------------------------------------------
-function __injectWebsocket(address, port) {
-	window.websocketconnected = false;
-  window.WebSocket = window.WebSocket || window.MozWebSocket;
-  if (!window.WebSocket) {
-    alert('Websocket no support. Not worked.');
-      return;
+    return fetch(`http://localhost:3000/api/streams?streams=${JSON.stringify(channels)}`).then(response => {
+      return response.json();
+    }).then(json => {
+      button.disabled = false;
+      // update each image
+      json.streams.forEach((stream, idx) => {
+        imgs[idx].src = `${stream.img}?${Date.now()}`; 
+      });
+    });
   }
-  this.connection = new WebSocket('ws://'+address+':'+port);
-  window.websocketconnection = this.connection;
-  connection.onopen = function () {
-      window.websocketconnected = true;
-      websocket_onConnect();
-  };
-  connection.onclose = function () {
-    console.log('connection closed');
-  };
-  connection.onerror = function (error) {
-    console.log('connection error', error);
-  };
-  connection.onmessage = function (message) {
-    websocket_onReceive(message.data);
-  };
-}
-
 </script>
 </body>
 </html>
