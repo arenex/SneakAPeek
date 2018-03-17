@@ -30,7 +30,7 @@ class Driver {
         channelNames.forEach(channelName => {
             var channelInfo = {};
             channelInfo.num = numPrefix++;
-            channelInfo.name = channelName;
+            channelInfo.name = channelName.toString();
             var promise = this.takeStreamPic(channelInfo);
             promises.push(promise);
         });
