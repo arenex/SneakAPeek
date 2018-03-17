@@ -32,8 +32,8 @@ function processClientRequest(message) {
                 sendChannelInfo(channelInfos);
             });
         }
-    } catch(e) {
-        console.log('Error:',e);
+    } catch (e) {
+        console.log('Error:', e);
         // ToDo: sendResponseToClient({response: "Bad Request"});
     }
 }
@@ -42,15 +42,15 @@ function sendResponseToClient(object) {
     // broadcast
     var jsonMsg = JSON.stringify(object);
     console.log('sending to clients');
-    clients.forEach(function(client) {
+    clients.forEach(function (client) {
         client.sendUTF(jsonMsg);
     });
 }
 
 function __setupWebSocket() {
     // Http server
-    server = http.createServer(function(request, response) {});
-    server.listen(webSocketsServerPort, function() {
+    server = http.createServer(function (request, response) {});
+    server.listen(webSocketsServerPort, function () {
         console.log((new Date()) + " Server is listening on port " + webSocketsServerPort);
     });
 
@@ -60,23 +60,23 @@ function __setupWebSocket() {
     });
 
     // This callback function is called every time someone tries to connect to the WebSocket server
-    wsServer.on('request', function(request) {
+    wsServer.on('request', function (request) {
         console.log((new Date()) + ' Connection from origin ' + request.origin + '.');
         // accept connection - you should check 'request.origin' to make sure that client is connecting from your website (http://en.wikipedia.org/wiki/Same_origin_policy)
-        var connection = request.accept(null, request.origin); 
+        var connection = request.accept(null, request.origin);
         // we need to know client index to remove them on 'close' event
         var index = clients.push(connection) - 1;
         console.log((new Date()) + ' Connection accepted.');
 
         // user sent some message
-        connection.on('message', function(message) {
+        connection.on('message', function (message) {
             if (message.type === 'utf8') { // accept only text
                 processClientRequest(message.utf8Data);
             }
         });
 
         // user disconnected
-        connection.on('close', function(connection) {
+        connection.on('close', function (connection) {
             console.log((new Date()) + " Peer " + connection.remoteAddress + " disconnected.");
             clients.splice(index, 1); // remove user from the list of connected clients
         });
