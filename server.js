@@ -10,7 +10,9 @@ var clients = [];
 __setupWebSocket();
 
 var ffmpegBusy = false;
-var makeTwitchSnapshots = require('./driver.js');
+var Driver = require('./driver.js');
+var driver = new Driver(
+);
 
 function sendChannelInfo(channelInfos) {
     var obj = {};
@@ -24,7 +26,8 @@ function processClientRequest(message) {
         var obj = JSON.parse(message);
         if (!ffmpegBusy && obj.command == 'makesnapshots' && obj.channels != null) {
             ffmpegBusy = true;
-            makeTwitchSnapshots(obj.channels).then(channelInfos => {
+            driver.run(obj.channels).then(channelInfos => {
+                console.log(channelInfos);
                 ffmpegBusy = false;
                 sendChannelInfo(channelInfos);
             });
