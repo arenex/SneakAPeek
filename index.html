@@ -19,7 +19,7 @@
 </head>
 <body>
 
-<div class="container"> <img class="img" data-channel="loltyler1" src="img1000.png"></img> </div>
+<div class="container"> <img class="img" data-channel="amenityrs" src="img1000.png"></img> </div>
 <div class="container"> <img class="img" data-channel="solary" src="img1001.png"></img> </div>
 <div class="container"> <img class="img" data-channel="c9sneaky" src="img1002.png"></img> </div>
 <div class="container"> <img class="img" data-channel="sparcmaclived" src="img1003.png"></img> </div>
@@ -41,7 +41,7 @@
       button.disabled = false;
       // update each image
       for(let channel in json.streams){
-        channels[channel].src = `${json.streams[channel].img}?${Date.now()}`; 
+        channels[channel].src = `${json.streams[channel].imgUrl}?${Date.now()}`; 
       };
     }).catch(err => {
       button.disabled = false;

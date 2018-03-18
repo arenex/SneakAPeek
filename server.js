@@ -1,23 +1,24 @@
 "use strict";
 process.title = 'sneakapeek';
 
+const path = require("path");
+const express = require("express");
+const port = 3000;
+const app = express();
+
 var ffmpegBusy = false;
 var Driver = require('./driver.js');
 var driver = new Driver(
+    null, //twitchID TODO
+    __dirname,
+    null //ffmpegPath TODO
 );
-
-const path = require("path");
-const express = require("express");
-
-const port = 3000;
-
-const app = express();
 
 // routes
 const router = express.Router();
 router.get('/', (req, res) => {
     res.json({
-        message: "hell world"
+        message: "hello world"
     });
 });
 router.get('/streams', (req, res) => {
@@ -31,7 +32,9 @@ router.get('/streams', (req, res) => {
             console.log(channelInfos);
             ffmpegBusy = false;
             for(let channel in channelInfos){
-                channelInfos[channel].img = `http://localhost:${port}/${channelInfos[channel].img}`;
+                if (channelInfos[channel].imgUrl) {
+                    channelInfos[channel].imgUrl = `http://${path.join(`localhost:${port}`, channelInfos[channel].imgUrl)}`;
+                }
             }
             res.json({
                 streams: channelInfos
