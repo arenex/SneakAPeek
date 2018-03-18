@@ -6,12 +6,11 @@ const express = require("express");
 const port = 3000;
 const app = express();
 
-var outputDir = path.resolve(__dirname,'output');
 var ffmpegBusy = false;
 var Driver = require('./driver.js');
 var driver = new Driver(
     null, //twitchID TODO
-    outputDir,
+    __dirname,
     null //ffmpegPath TODO
 );
 
@@ -19,7 +18,7 @@ var driver = new Driver(
 const router = express.Router();
 router.get('/', (req, res) => {
     res.json({
-        message: "hell world"
+        message: "hello world"
     });
 });
 router.get('/streams', (req, res) => {
@@ -33,7 +32,7 @@ router.get('/streams', (req, res) => {
             console.log(channelInfos);
             ffmpegBusy = false;
             for(let channel in channelInfos){
-                channelInfos[channel].img = `http://localhost:${port}/${channelInfos[channel].img}`;
+                channelInfos[channel].imgUrl = `http://localhost:${port}/${channelInfos[channel].imgUrl}`;
             }
             res.json({
                 streams: channelInfos

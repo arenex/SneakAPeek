@@ -4,6 +4,7 @@ process.title = 'sneakapeek-driver';
 const {
     exec
 } = require('child_process');
+const path = require("path");
 const twitchGetStream = require("twitch-get-stream");
 
 function execP(cmd) {
@@ -15,14 +16,15 @@ function execP(cmd) {
 }
 
 class Driver {
-    constructor(twitchId, outputDir, ffmpegPath = "ffmpeg") {
+    constructor(twitchId, workingDir, ffmpegPath = "ffmpeg") {
         this.twitchId = twitchId;
-        this.outputDir = outputDir;
+        this.workingDir = workingDir;
+        this.outputDir = 'output';
         this.ffmpegPath = ffmpegPath;
         this.getTwitchStream = (channel) => twitchGetStream(this.twitchId).get(channel);
     }
-    grabTwitchFrameAndSave(url, saveName) {
-        return execP(`"${this.ffmpegPath}" -y -i "${url}" -ss 00:00:00 -f image2 -vframes 1 ${path.resolve(this.outputDir, saveName)}`);
+    grabTwitchFrameAndSave(url, imgFullPath) {
+        return execP(`"${this.ffmpegPath}" -y -i "${url}" -ss 00:00:00 -f image2 -vframes 1 ${imgFullPath}`);
     }
     run(channelNames) {
         var channelInfos = [];
@@ -43,17 +45,18 @@ class Driver {
         });
     }
     takeStreamPic(channelInfo) {
-        const imageSaveName = `img${channelInfo.num}.png`;
-        return execP(`rm -f ${imageSaveName}`).then(() => {
-            channelInfo.img = null;
+        const imgFullPath = path.resolve(this.workingDir, this.outputDir, `img${channelInfo.num}.png`);
+        const imgUrl = path.join(this.outputDir, `img${channelInfo.num}.png`);
+        return execP(`rm -f ${imgFullPath}`).then(() => {
+            channelInfo.imgUrl = null;
             return new Promise((resolve) => {
                 this.getStreamUrl(channelInfo.name).then(url => {
-                    channelInfo.url = '';
+                    channelInfo.streamUrl = '';
                     if (url !== null) {
-                        channelInfo.url = url;
-                        this.grabTwitchFrameAndSave(url, imageSaveName).then(() => {
+                        channelInfo.streamUrl = url;
+                        this.grabTwitchFrameAndSave(url, imgFullPath).then(() => {
                             channelInfo.success = true;
-                            channelInfo.img = imageSaveName;
+                            channelInfo.imgUrl = imgUrl;
                             resolve(channelInfo);
                         });
                     } else {
