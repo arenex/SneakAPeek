@@ -5,12 +5,14 @@
   "main": "server.js",
   "dependencies": {
     "express": "^4.16.3",
+    "opn": "^5.3.0",
     "twitch-get-stream": "^0.4.1",
-    "twitch-url": "^1.0.0",
-    "websocket": "1.0.23"
+    "twitch-url": "^1.0.0"
   },
   "devDependencies": {},
-  "scripts": {},
+  "scripts": {
+    "start": "node main.js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC"
