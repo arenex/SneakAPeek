@@ -41,8 +41,6 @@
       button.disabled = false;
       // update each image
       for(let channel in json.streams){
-        // channels[channel].src = `${json.streams[channel].img}?${Date.now()}`; 
-        // channels[channel].src = `${'output/img'+json.streams[channel].num+'.png'}?${Date.now()}`; 
         channels[channel].src = `${json.streams[channel].imgUrl}?${Date.now()}`; 
       };
     }).catch(err => {

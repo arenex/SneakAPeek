@@ -45,8 +45,8 @@ class Driver {
         });
     }
     takeStreamPic(channelInfo) {
-        const imgFullPath = path.resolve(this.workingDir, this.outputDir, `img${channelInfo.num}.png`);
         const imgUrl = path.join(this.outputDir, `img${channelInfo.num}.png`);
+        const imgFullPath = path.resolve(this.workingDir, imgUrl);
         return execP(`rm -f ${imgFullPath}`).then(() => {
             channelInfo.imgUrl = null;
             return new Promise((resolve) => {

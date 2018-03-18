@@ -32,7 +32,9 @@ router.get('/streams', (req, res) => {
             console.log(channelInfos);
             ffmpegBusy = false;
             for(let channel in channelInfos){
-                channelInfos[channel].imgUrl = `http://localhost:${port}/${channelInfos[channel].imgUrl}`;
+                if (channelInfos[channel].imgUrl) {
+                    channelInfos[channel].imgUrl = `http://${path.join(`localhost:${port}`, channelInfos[channel].imgUrl)}`;
+                }
             }
             res.json({
                 streams: channelInfos
