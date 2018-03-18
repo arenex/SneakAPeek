@@ -6,4 +6,4 @@ var config = require('./config.js');
 const server = Server(config);
 
 const opn = require('opn');
-opn(config.setBrowserUrl);
+opn(config.openBrowserUrl);
