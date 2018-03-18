@@ -6,13 +6,13 @@ const express = require("express");
 const port = 3000;
 const app = express();
 
-var imgDir = path.resolve(__dirname)+'\\imgs\\';
+var outputDir = path.resolve(__dirname,'output');
 var ffmpegBusy = false;
 var Driver = require('./driver.js');
 var driver = new Driver(
     null, //twitchID TODO
-    null, //ffmpegPath TODO
-    imgDir //
+    outputDir,
+    null //ffmpegPath TODO
 );
 
 // routes
