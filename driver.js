@@ -15,13 +15,14 @@ function execP(cmd) {
 }
 
 class Driver {
-    constructor(twitchId, ffmpegPath = "ffmpeg") {
+    constructor(twitchId, ffmpegPath = "ffmpeg", imgDir) {
         this.twitchId = twitchId;
         this.ffmpegPath = ffmpegPath;
+        this.imgDir = imgDir;
         this.getTwitchStream = (channel) => twitchGetStream(this.twitchId).get(channel);
     }
     grabTwitchFrameAndSave(url, saveName) {
-        return execP(`"${this.ffmpegPath}" -y -i "${url}" -ss 00:00:00 -f image2 -vframes 1 ${saveName}`);
+        return execP(`"${this.ffmpegPath}" -y -i "${url}" -ss 00:00:00 -f image2 -vframes 1 ${this.imgDir+saveName}`);
     }
     run(channelNames) {
         var channelInfos = [];
