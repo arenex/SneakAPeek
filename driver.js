@@ -5,6 +5,7 @@ const {
     exec
 } = require('child_process');
 const path = require("path");
+const fs = require("fs");
 const twitchGetStream = require("twitch-get-stream");
 
 function execP(cmd) {
@@ -15,11 +16,24 @@ function execP(cmd) {
     });
 }
 
+function clearDirPng(dirPath) {
+    const files = fs.readdirSync(dirPath);
+    files.filter(filePath => path.extname(filePath) === ".png").forEach(filePath => {
+        filePath = path.join(dirPath, filePath);
+        try {
+            fs.unlinkSync(filePath);
+        } catch (e) {
+            console.error(e);
+        }
+    })
+};
+
 class Driver {
     constructor(twitchId, workingDir, ffmpegPath = "ffmpeg") {
         this.twitchId = twitchId;
         this.workingDir = workingDir;
-        this.outputDir = 'output';
+        this.outputDirName = 'output';
+        this.outputDirPath = path.resolve(this.workingDir, this.outputDirName);
         this.ffmpegPath = ffmpegPath;
         this.getTwitchStream = (channel) => twitchGetStream(this.twitchId).get(channel);
     }
@@ -30,6 +44,7 @@ class Driver {
         var channelInfos = [];
         var numPrefix = 1000;
         var promises = [];
+        clearDirPng(this.outputDirPath);
         channelNames.forEach(channelName => {
             var channelInfo = {};
             channelInfo.num = numPrefix++;
@@ -45,25 +60,23 @@ class Driver {
         });
     }
     takeStreamPic(channelInfo) {
-        const imgUrl = path.join(this.outputDir, `img${channelInfo.num}.png`);
+        const imgUrl = path.join(this.outputDirName, `img${channelInfo.num}_${Date.now()}.png`);
         const imgFullPath = path.resolve(this.workingDir, imgUrl);
-        return execP(`rm -f ${imgFullPath}`).then(() => {
-            channelInfo.imgUrl = null;
-            return new Promise((resolve) => {
-                this.getStreamUrl(channelInfo.name).then(url => {
-                    channelInfo.streamUrl = '';
-                    if (url !== null) {
-                        channelInfo.streamUrl = url;
-                        this.grabTwitchFrameAndSave(url, imgFullPath).then(() => {
-                            channelInfo.success = true;
-                            channelInfo.imgUrl = imgUrl;
-                            resolve(channelInfo);
-                        });
-                    } else {
-                        channelInfo.success = false;
+        channelInfo.imgUrl = null;
+        return new Promise((resolve) => {
+            this.getStreamUrl(channelInfo.name).then(url => {
+                channelInfo.streamUrl = '';
+                if (url !== null) {
+                    channelInfo.streamUrl = url;
+                    this.grabTwitchFrameAndSave(url, imgFullPath).then(() => {
+                        channelInfo.success = true;
+                        channelInfo.imgUrl = imgUrl;
                         resolve(channelInfo);
-                    }
-                });
+                    });
+                } else {
+                    channelInfo.success = false;
+                    resolve(channelInfo);
+                }
             });
         }).then(channelInfo => {
             return channelInfo;
