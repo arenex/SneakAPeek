@@ -17,7 +17,7 @@ function execP(cmd) {
 }
 
 function clearDirPng(dirPath) {
-    var files = fs.readdirSync(dirPath);
+    const files = fs.readdirSync(dirPath);
     files.filter(filePath => path.extname(filePath) === ".png").forEach(filePath => {
         filePath = path.join(dirPath, filePath);
         try {
@@ -60,7 +60,7 @@ class Driver {
         });
     }
     takeStreamPic(channelInfo) {
-        const imgUrl = path.join(this.outputDirName, `img${channelInfo.num}${Date.now()}.png`);
+        const imgUrl = path.join(this.outputDirName, `img${channelInfo.num}_${Date.now()}.png`);
         const imgFullPath = path.resolve(this.workingDir, imgUrl);
         channelInfo.imgUrl = null;
         return new Promise((resolve) => {
